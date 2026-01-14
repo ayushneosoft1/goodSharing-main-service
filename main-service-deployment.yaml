@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-service
+  namespace: services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-service
+  template:
+    metadata:
+      labels:
+        app: main-service
+    spec:
+      containers:
+        - name: main-service
+          image: ayushneosoft/goodsharing-main-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4000
+          env:
+            - name: USER_SERVICE_URL
+              value: http://user-service.services.svc.cluster.local:4001/graphql
+            - name: POSTS_SERVICE_URL
+              value: http://posts-service.services.svc.cluster.local:4002/graphql
+            - name: JWT_SECRET
+              value: super-secret-key   # move to Secret later

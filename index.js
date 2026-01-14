@@ -10,7 +10,8 @@ const server = new ApolloServer({
 });
 
 startStandaloneServer(server, {
-  listen: { port: 4000 },
+  listen: { port: 4000, host: "0.0.0.0" },
+  path: "/graphql",
   context: async ({ req }) => {
     const authHeader = req.headers.authorization;
 
@@ -20,22 +21,20 @@ startStandaloneServer(server, {
 
     try {
       const token = authHeader.replace("Bearer ", "");
-      console.log("🚀 ~ token: ====>", token);
       const decoded = jwt.verify(token, JWT_SECRET);
-      console.log("🚀 ~ decoded: ====>", decoded);
 
       return {
         user: decoded,
         headers: {
-          ...req.headers, // 👈 VERY IMPORTANT
+          ...req.headers,
           "x-user": JSON.stringify(decoded),
         },
       };
-    } catch (err) {
-      console.log("inside error ========>");
+    } catch {
       return { user: null };
     }
   },
 }).then(() => {
-  console.log("Main-service running on 4000");
+  console.log("Main-service running on 0.0.0.0:4000/graphql");
 });
+
