@@ -1,4 +1,6 @@
 import { ApolloGateway, RemoteGraphQLDataSource } from "@apollo/gateway";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const gateway = new ApolloGateway({
   serviceList: [

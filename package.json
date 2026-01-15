@@ -2,8 +2,9 @@
   "name": "goodsharing-main-service",
   "type": "module",
   "dependencies": {
-    "@apollo/server": "^4",
     "@apollo/gateway": "^2",
+    "@apollo/server": "^4",
+    "dotenv": "^17.2.3",
     "graphql": "^16",
     "jsonwebtoken": "^9"
   }

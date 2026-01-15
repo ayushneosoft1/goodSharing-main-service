@@ -2,15 +2,15 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { gateway } from "./gateway.js";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = "super-secret-key";
+import dotenv from "dotenv";
+dotenv.config();
 
 const server = new ApolloServer({
   gateway,
 });
 
 startStandaloneServer(server, {
-  listen: { port: 4000, host: "0.0.0.0" },
+  listen: { port: 4000, host: "127.0.0.1" },
   path: "/graphql",
   context: async ({ req }) => {
     const authHeader = req.headers.authorization;
@@ -21,7 +21,7 @@ startStandaloneServer(server, {
 
     try {
       const token = authHeader.replace("Bearer ", "");
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       return {
         user: decoded,
@@ -35,6 +35,5 @@ startStandaloneServer(server, {
     }
   },
 }).then(() => {
-  console.log("Main-service running on 0.0.0.0:4000/graphql");
+  console.log("Main-service running on 127.0.0.1:4000/graphql");
 });
-
