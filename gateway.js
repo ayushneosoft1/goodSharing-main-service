@@ -12,6 +12,8 @@ export const gateway = new ApolloGateway({
     return new RemoteGraphQLDataSource({
       url,
       willSendRequest({ request, context }) {
+        console.log("Gateway forwarding user:", context.user);
+
         if (context.user) {
           request.http.headers.set("x-user", JSON.stringify(context.user));
         }
