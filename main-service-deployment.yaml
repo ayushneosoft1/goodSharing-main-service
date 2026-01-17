@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: main-service
-          image: ayushneosoft/goodsharing-main-service:v1.0.0
+          image: ayushneosoft/goodsharing-main-service:v1.0.3
           imagePullPolicy: Always
           ports:
             - containerPort: 4000
