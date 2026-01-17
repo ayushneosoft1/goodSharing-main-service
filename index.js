@@ -10,7 +10,7 @@ const server = new ApolloServer({
 });
 
 startStandaloneServer(server, {
-  listen: { port: 4000, host: "127.0.0.1" },
+  listen: { port: 4000, host: "0.0.0.0" },
   path: "/graphql",
   context: async ({ req }) => {
     const authHeader = req.headers.authorization;
@@ -35,5 +35,5 @@ startStandaloneServer(server, {
     }
   },
 }).then(() => {
-  console.log("Main-service running on 127.0.0.1:4000/graphql");
+  console.log("Main-service running on 0.0.0.0:4000/graphql");
 });
