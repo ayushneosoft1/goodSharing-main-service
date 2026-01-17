@@ -35,5 +35,5 @@ startStandaloneServer(server, {
     }
   },
 }).then(() => {
-  console.log("Main-service running on 0.0.0.0:4000/graphql");
+  console.log("Main Service running on http://0.0.0.0:4000/graphql");
 });
