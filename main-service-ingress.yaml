@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: goodsharing.local
+    - host: goodsharing.cloud
       http:
         paths:
           - path: /graphql
