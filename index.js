@@ -1,5 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { gateway } from "./gateway.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -7,6 +8,12 @@ dotenv.config();
 
 const server = new ApolloServer({
   gateway,
+  csrfPrevention: false,
+ plugins: [
+    ApolloServerPluginLandingPageLocalDefault({
+      embed: true,
+    }),
+  ],	
 });
 
 startStandaloneServer(server, {
