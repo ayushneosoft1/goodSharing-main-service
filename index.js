@@ -9,15 +9,22 @@ dotenv.config();
 const server = new ApolloServer({
   gateway,
   csrfPrevention: false,
- plugins: [
+  plugins: [
     ApolloServerPluginLandingPageLocalDefault({
       embed: true,
     }),
-  ],	
+  ],
 });
 
 startStandaloneServer(server, {
   listen: { port: 4000, host: "0.0.0.0" },
+
+  // ✅ ADD CORS HERE
+  cors: {
+    origin: "*", // allow all origins (for development)
+    credentials: true,
+  },
+
   path: "/graphql",
   context: async ({ req }) => {
     const authHeader = req.headers.authorization;
@@ -37,8 +44,9 @@ startStandaloneServer(server, {
           "x-user": JSON.stringify(decoded),
         },
       };
-    } catch {
-      return { user: null };
+    } catch (err) {
+      console.log("Invalid token:", err.message);
+      throw new Error("Invalid or expired token");
     }
   },
 }).then(() => {
