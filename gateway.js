@@ -6,6 +6,10 @@ export const gateway = new ApolloGateway({
   serviceList: [
     { name: "users", url: process.env.USER_SERVICE_URL },
     { name: "posts", url: process.env.POSTS_SERVICE_URL },
+    {
+      name: "notifications",
+      url: process.env.NOTIFICATION_SERVICE_URL,
+    },
   ],
 
   buildService({ url }) {
