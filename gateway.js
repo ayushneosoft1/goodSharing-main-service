@@ -12,14 +12,23 @@ export const gateway = new ApolloGateway({
     },
   ],
 
-  buildService({ url }) {
+  buildService({ name, url }) {
     return new RemoteGraphQLDataSource({
       url,
       willSendRequest({ request, context }) {
-        console.log("Gateway forwarding user:", context.user);
+        console.log("SUBGRAPH:", name);
+        console.log("OPERATION:", request.operationName);
+        console.log("HAS USER:", Boolean(context.user));
 
         if (context.user) {
-          request.http.headers.set("x-user", JSON.stringify(context.user));
+          const xUser = JSON.stringify(context.user);
+
+          request.http.headers.set("x-user", xUser);
+
+          console.log(
+            "X-USER HEADER SET:",
+            Boolean(request.http.headers.get("x-user")),
+          );
         }
       },
     });
