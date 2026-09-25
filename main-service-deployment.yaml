@@ -25,4 +25,7 @@ spec:
             - name: POSTS_SERVICE_URL
               value: http://posts-service.services.svc.cluster.local:4002/graphql
             - name: JWT_SECRET
-              value: super-secret-key   # move to Secret later
+              valueFrom:
+                secretKeyRef:
+                  name: main-service-secret
+                  key: JWT_SECRET

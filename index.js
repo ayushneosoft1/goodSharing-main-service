@@ -27,8 +27,6 @@ startStandaloneServer(server, {
   path: "/graphql",
 
   context: async ({ req }) => {
-    console.log("Incoming headers:", req.headers); //  DEBUG
-
     const authHeader = req.headers.authorization;
 
     //  Step 1: Check header exists
@@ -43,12 +41,8 @@ startStandaloneServer(server, {
         ? authHeader.split(" ")[1]
         : authHeader;
 
-      console.log("Token received:", token); //  DEBUG
-
       //  Step 3: Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      console.log("Decoded user:", decoded); //  DEBUG
 
       return {
         user: decoded, //  IMPORTANT
