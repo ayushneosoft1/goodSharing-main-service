@@ -48,7 +48,7 @@ startStandaloneServer(server, {
         user: decoded, //  IMPORTANT
       };
     } catch (err) {
-      console.log("Invalid token:", err.message);
+      console.log("Invalid token");
       return { user: null };
     }
   },
