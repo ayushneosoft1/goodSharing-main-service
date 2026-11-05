@@ -157,9 +157,8 @@ Example:
 
 ```text
 posts-service creates a post
-posts-service needs push tokens for subscribed users
-posts-service calls user-service getPushTokens
-posts-service sends notifications
+posts-service publishes a post-created event
+notification-service processes the event and handles notification delivery
 ```
 
 This is not just response stitching. This is backend workflow logic.
@@ -167,8 +166,8 @@ This is not just response stitching. This is backend workflow logic.
 Current example:
 
 ```text
-posts-service -> user-service
-getPushTokens(userIds)
+posts-service -> notification-service
+POST /internal/events/post-created
 ```
 
 Rule:
