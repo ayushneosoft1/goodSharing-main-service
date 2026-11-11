@@ -39,7 +39,6 @@ Other cluster components:
 - `goodSharing-posts-service` Dockerfile was updated to use `node:20-alpine`.
 - Posts service image was rebuilt and deployed after the Node 20 fix.
 - Redis was added to the cluster for service dependencies.
-- `INTERNAL_SERVICE_SECRET` was added as a Kubernetes secret and wired into services.
 - nginx ingress was fixed by ensuring the controller runs on the kind control-plane node.
 - HTTPS was added with cert-manager and Let's Encrypt.
 

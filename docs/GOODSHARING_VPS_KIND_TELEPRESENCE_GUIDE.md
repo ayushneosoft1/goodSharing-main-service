@@ -273,12 +273,7 @@ kubectl -n services create secret generic user-db-secret --from-literal=DB_URL='
 kubectl -n services create secret generic posts-db-secret --from-literal=DB_URL='<posts-db-url>'
 ```
 
-Create internal service secret:
-
-```bash
-kubectl -n services create secret generic internal-service-secret \
-  --from-literal=INTERNAL_SERVICE_SECRET='<shared-internal-secret>'
-```
+Posts-service authenticates post-created events using `INTERNAL_EVENT_AUTH_TOKEN`, sourced from the `notification-service-secret` Kubernetes Secret. Do not create or configure the obsolete `INTERNAL_SERVICE_SECRET`.
 
 If using Aiven/Postgres CA certificates, create CA secrets too:
 
@@ -429,19 +424,21 @@ Posts service:
 
 ```text
 DATABASE_URL from posts-db-secret
+JWT_SECRET=<secret>
 REDIS_HOST=redis
 REDIS_PORT=6379
-USER_SERVICE_URL=http://user-service.services.svc.cluster.local:<port>/graphql
-INTERNAL_SERVICE_SECRET from internal-service-secret
+NOTIFICATION_SERVICE_URL=http://notification-service.services.svc.cluster.local:4003
+INTERNAL_EVENT_AUTH_TOKEN from notification-service-secret
+NOTIFICATION_EVENT_TIMEOUT_MS=5000
 ```
 
 User service:
 
 ```text
 DATABASE_URL from user-db-secret
+JWT_SECRET=<secret>
 REDIS_HOST=redis
 REDIS_PORT=6379
-INTERNAL_SERVICE_SECRET from internal-service-secret
 ```
 
 Check actual env:
@@ -767,17 +764,19 @@ For direct local posts-service testing, you do not need Telepresence intercept. 
 
 ```bash
 kubectl -n services port-forward svc/redis 6380:6379
-kubectl -n services port-forward svc/user-service 4001:4001
+kubectl -n services port-forward svc/notification-service 4003:4003
 ```
 
 Create local env file:
 
 ```text
 DATABASE_URL=<posts-db-url>
+JWT_SECRET=<secret>
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6380
-USER_SERVICE_URL=http://127.0.0.1:4001/graphql
-INTERNAL_SERVICE_SECRET=<same-secret-as-cluster>
+NOTIFICATION_SERVICE_URL=http://127.0.0.1:4003
+INTERNAL_EVENT_AUTH_TOKEN=<configured-local-token>
+NOTIFICATION_EVENT_TIMEOUT_MS=5000
 ```
 
 Start posts-service locally:
