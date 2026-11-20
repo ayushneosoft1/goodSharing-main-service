@@ -1,13 +1,13 @@
 # GoodSharing Current State
 
-Last updated: 2026-07-10
+Last updated: 2026-11-20
 
 This file tracks the latest known working state and recent operational notes.
 
 ## Working Now
 
-- `https://goodsharing.cloud/graphql` is active and working.
-- Hostinger DNS points `goodsharing.cloud` to VPS IP `31.97.206.234`.
+- `https://goodsharing.space/graphql` is active and working.
+- The verified `goodsharing.space` root domain resolves to VPS IP `31.97.206.234`.
 - Old Hostinger/wrong IP record `2.57.91.91` was removed.
 - Kubernetes context on laptop is now `kind-goodsharing-cluster`.
 - `kubectl get pods -n services` works from the laptop.
@@ -61,7 +61,7 @@ Do not use JWT directly against local posts-service. JWT belongs at the gateway.
 For gateway calls:
 
 ```text
-https://goodsharing.cloud/graphql
+https://goodsharing.space/graphql
 ```
 
 Use header:

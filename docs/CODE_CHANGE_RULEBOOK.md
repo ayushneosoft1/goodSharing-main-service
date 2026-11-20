@@ -312,7 +312,7 @@ posts-service does not decode JWT directly.
 When calling public gateway:
 
 ```text
-https://goodsharing.cloud/graphql
+https://goodsharing.space/graphql
 ```
 
 Use:

@@ -1,6 +1,6 @@
 # GoodSharing VPS Kind Cluster + HTTPS + Telepresence Runbook
 
-This guide explains how to rebuild the GoodSharing backend setup from scratch on a VPS, expose it publicly at `https://goodsharing.cloud/graphql`, and run only one service locally with Telepresence while the other services keep running in Kubernetes.
+This guide explains how to rebuild the GoodSharing backend setup from scratch on a VPS, expose it publicly at `https://goodsharing.space/graphql`, and run only one service locally with Telepresence while the other services keep running in Kubernetes.
 
 Do not put real passwords, API keys, JWT secrets, database URLs, or third-party credentials in this document. Keep those in a password manager or Kubernetes secrets.
 
@@ -15,7 +15,7 @@ GoodSharing has three backend services:
 The public browser/API user calls:
 
 ```text
-https://goodsharing.cloud/graphql
+https://goodsharing.space/graphql
 ```
 
 That request goes:
@@ -34,12 +34,11 @@ Checkpoint: if you understand that only `main-service` is public and the other s
 
 ## 2. Hostinger DNS Setup
 
-In Hostinger DNS for `goodsharing.cloud`, keep these records:
+In Hostinger DNS for `goodsharing.space`, keep these records:
 
 ```text
-Type   Name   Content          TTL
-A      @      31.97.206.234    14400 or 300
-CNAME  www    goodsharing.cloud 300
+Type   Name   Content
+A      @      31.97.206.234
 ```
 
 Remove old/wrong A records, for example any record pointing to `2.57.91.91`.
@@ -49,8 +48,7 @@ Do not use Hostinger parking/default DNS records for the root domain once your V
 Check from your laptop:
 
 ```bash
-dig +short goodsharing.cloud
-dig +short www.goodsharing.cloud
+dig +short goodsharing.space
 ```
 
 Expected:
@@ -59,7 +57,7 @@ Expected:
 31.97.206.234
 ```
 
-Checkpoint: if `dig +short goodsharing.cloud` returns only your VPS IP, proceed. If it still returns an old IP, wait for DNS propagation or remove the old record.
+Checkpoint: if `dig +short goodsharing.space` returns only your VPS IP, proceed. If it still returns an old IP, wait for DNS propagation or remove the old record.
 
 ## 3. VPS Base Setup
 
@@ -459,21 +457,29 @@ Create ingress for main-service only:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: main-service-ingress
+  name: main-service-space-ingress
   namespace: services
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - goodsharing.space
+      secretName: goodsharing-space-tls
   rules:
-    - host: goodsharing.cloud
+    - host: goodsharing.space
       http:
         paths:
-          - path: /
+          - path: /graphql
             pathType: Prefix
             backend:
               service:
                 name: main-service
                 port:
-                  number: 4000
+                  number: 80
 ```
 
 Apply:
@@ -486,12 +492,12 @@ Check:
 
 ```bash
 kubectl -n services get ingress
-curl -i http://goodsharing.cloud/graphql
+curl -i http://goodsharing.space/graphql
 ```
 
-Expected: you should reach Apollo/GraphQL response, not Hostinger parking.
+Expected: the HTTP request should redirect to the HTTPS GraphQL endpoint, not Hostinger parking.
 
-Checkpoint: if `http://goodsharing.cloud/graphql` works without port-forward, proceed. If it only works with port-forward, nginx ingress is probably not on the control-plane node or DNS points to the wrong IP.
+Checkpoint: HTTP should redirect to HTTPS. Verify that the redirect points to `https://goodsharing.space/graphql`. If the request does not reach the HTTPS endpoint, check nginx ingress and DNS.
 
 ## 15. Install cert-manager for HTTPS
 
@@ -565,21 +571,21 @@ metadata:
 spec:
   tls:
     - hosts:
-        - goodsharing.cloud
-      secretName: goodsharing-cloud-tls
+        - goodsharing.space
+      secretName: goodsharing-space-tls
 ```
 
 Check certificate:
 
 ```bash
 kubectl -n services get certificate
-kubectl -n services describe certificate goodsharing-cloud-tls
+kubectl -n services describe certificate goodsharing-space-tls
 ```
 
 Check HTTPS:
 
 ```bash
-curl -i https://goodsharing.cloud/graphql
+curl -i https://goodsharing.space/graphql
 ```
 
 Checkpoint: if HTTPS returns GraphQL response and browser does not show Hostinger parking, proceed.
@@ -591,7 +597,7 @@ If DNS recently changed from an old IP to the VPS IP, cert-manager may still res
 Check from inside cluster:
 
 ```bash
-kubectl -n services run dns-test --rm -it --image=busybox:1.36 -- nslookup goodsharing.cloud
+kubectl -n services run dns-test --rm -it --image=busybox:1.36 -- nslookup goodsharing.space
 ```
 
 Expected:
@@ -603,7 +609,7 @@ Expected:
 If it still resolves to old IP, wait for DNS propagation. For temporary lab use, you can add a CoreDNS override:
 
 ```text
-31.97.206.234 goodsharing.cloud www.goodsharing.cloud
+31.97.206.234 goodsharing.space
 ```
 
 Checkpoint: if in-cluster DNS resolves to VPS IP, Let's Encrypt HTTP-01 can work.
@@ -613,7 +619,7 @@ Checkpoint: if in-cluster DNS resolves to VPS IP, Let's Encrypt HTTP-01 can work
 Test gateway:
 
 ```bash
-curl -sS -X POST https://goodsharing.cloud/graphql \
+curl -sS -X POST https://goodsharing.space/graphql \
   -H 'Content-Type: application/json' \
   --data '{"query":"query { __typename }"}'
 ```
@@ -627,7 +633,7 @@ Expected:
 Test with token:
 
 ```bash
-curl -sS -X POST https://goodsharing.cloud/graphql \
+curl -sS -X POST https://goodsharing.space/graphql \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer <jwt-token>' \
   --data '{"query":"query { getPostDetails(postId: 108) { id title category } }"}'
@@ -828,7 +834,7 @@ Checkpoint: if createPost inserts with the correct owner id, local auth simulati
 When calling gateway:
 
 ```text
-https://goodsharing.cloud/graphql
+https://goodsharing.space/graphql
 ```
 
 Use:
@@ -884,8 +890,8 @@ Cause:
 Check:
 
 ```bash
-dig +short goodsharing.cloud
-curl -I http://goodsharing.cloud/graphql
+dig +short goodsharing.space
+curl -I http://goodsharing.space/graphql
 ```
 
 Problem: API only works with port-forward.
@@ -911,7 +917,7 @@ Cause:
 Check:
 
 ```bash
-kubectl -n services describe certificate goodsharing-cloud-tls
+kubectl -n services describe certificate goodsharing-space-tls
 kubectl -n services get challenge,order
 ```
 
@@ -986,9 +992,9 @@ After rebuild, verify in this order:
 2. kind cluster nodes are Ready.
 3. nginx ingress pod runs on control-plane.
 4. DNS points to VPS IP.
-5. `http://goodsharing.cloud/graphql` works without port-forward.
+5. `http://goodsharing.space/graphql` redirects to HTTPS without port-forward.
 6. cert-manager pods are Running.
-7. `https://goodsharing.cloud/graphql` works.
+7. `https://goodsharing.space/graphql` works.
 8. laptop `kubectl` context is `kind-goodsharing-cluster`.
 9. Telepresence traffic-manager is Running.
 10. `telepresence connect --docker --namespace services` works.

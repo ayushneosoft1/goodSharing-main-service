@@ -1,12 +1,20 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: main-service-ingress
+  name: main-service-space-ingress
   namespace: services
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - goodsharing.space
+      secretName: goodsharing-space-tls
   rules:
-    - host: goodsharing.cloud
+    - host: goodsharing.space
       http:
         paths:
           - path: /graphql
