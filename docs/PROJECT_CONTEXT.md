@@ -1,6 +1,6 @@
 # GoodSharing Project Context
 
-Last updated: 2026-07-10
+Last updated: 2026-11-20
 
 This file is the short project memory for future AI chats and teammates. Read this first before scanning repos.
 
@@ -14,8 +14,8 @@ This file is the short project memory for future AI chats and teammates. Read th
 
 ## Public API
 
-- Production GraphQL URL: `https://goodsharing.cloud/graphql`
-- HTTP also worked earlier, but HTTPS is the intended public URL.
+- Production GraphQL URL: `https://goodsharing.space/graphql`
+- HTTP requests redirect to HTTPS; HTTPS is the intended public URL.
 - Public clients should call the gateway, not user-service/posts-service directly.
 
 ## Infrastructure
@@ -60,12 +60,11 @@ This file is the short project memory for future AI chats and teammates. Read th
 
 ## Hostinger DNS
 
-Expected DNS records for `goodsharing.cloud`:
+Verified root-domain DNS record for `goodsharing.space`:
 
 ```text
-Type   Name   Content          TTL
-A      @      31.97.206.234    14400 or 300
-CNAME  www    goodsharing.cloud 300
+Type   Name   Content
+A      @      31.97.206.234
 ```
 
 Old/wrong records such as `2.57.91.91` should not exist.
@@ -86,7 +85,7 @@ x-user: {"id":"159","email":"tenjuly2@gmail.com"}
 
 For deployed gateway testing:
 
-- URL: `https://goodsharing.cloud/graphql`.
+- URL: `https://goodsharing.space/graphql`.
 - Header:
 
 ```text
